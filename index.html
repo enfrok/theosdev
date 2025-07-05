@@ -165,5 +165,62 @@
     let savedName = "";
     let savedPassword = "19841984";
 
-    function
-      
+    function loginUser() {
+      const name = document.getElementById("login-name").value.trim();
+      const pass = document.getElementById("login-password").value.trim();
+      const error = document.getElementById("login-error");
+
+      if (pass.length < 6) {
+        error.textContent = "Password should be minimum 6 digits.";
+        return;
+      }
+
+      error.textContent = "";
+      savedName = name || "User";
+      savedPassword = pass;
+      document.getElementById("login-screen").classList.add("hidden");
+      document.getElementById("desktop").classList.remove("hidden");
+      document.getElementById("desktop-greeting").textContent = `Welcome to your desktop, ${savedName}!`;
+    }
+
+    let calcExpression = "";
+    function appendCalc(val) {
+      calcExpression += val;
+      document.getElementById("calc-display").value = calcExpression;
+    }
+
+    function calculate() {
+      try {
+        calcExpression = eval(calcExpression).toString();
+        document.getElementById("calc-display").value = calcExpression;
+      } catch {
+        document.getElementById("calc-display").value = "Error";
+      }
+    }
+
+    function clearCalc() {
+      calcExpression = "";
+      document.getElementById("calc-display").value = "";
+    }
+
+    function openApp(id) {
+      document.querySelectorAll('.window').forEach(win => win.style.display = 'none');
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function loadWebsite() {
+      const input = document.getElementById("url").value;
+      const frame = document.getElementById("webview");
+      if (input.startsWith("https://")) {
+        if (input.includes("wikipedia") || input.includes("spotify")) {
+          frame.src = input;
+        } else {
+          frame.srcdoc = "<p style='color:red;'>Website not supported by this OS.</p>";
+        }
+      } else {
+        frame.srcdoc = "<p style='color:red;'>Add https:// to run or if it doesn't work, the website is not supported.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
