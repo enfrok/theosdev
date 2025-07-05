@@ -140,6 +140,17 @@
     <button onclick="enterOS()">Continue</button>
   </div>
 
+  <!-- Main OS Interface -->
+  <div id="os-interface" class="hidden">
+    <div class="taskbar">
+      <span style="padding: 10px;">🖥 EnfrokOS</span>
+    </div>
+    <div style="padding: 50px; text-align:center;">
+      <h1>Welcome to your desktop, <span id="user-display"></span>!</h1>
+      <p>Your OS is loading features soon...</p>
+    </div>
+  </div>
+
   <script>
     let savedPassword = "";
     let savedUsername = "";
@@ -179,7 +190,8 @@
 
     function enterOS() {
       document.getElementById('notice-screen').classList.add('hidden');
-      alert("OS would launch here (add more UI below)");
+      document.getElementById('os-interface').classList.remove('hidden');
+      document.getElementById('user-display').textContent = savedUsername;
     }
   </script>
 
