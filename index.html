@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Enfrok OS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Roboto&family=Samsung+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,8 +15,8 @@
     html, body {
       width: 100%;
       height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif;
-      background-color: #888; /* grey background */
+      font-family: 'Arimo', sans-serif;
+      background-color: #888;
       color: white;
     }
 
@@ -34,14 +34,13 @@
       z-index: 1000;
       padding: 20px;
       text-align: center;
-      transition: opacity 1s ease;
     }
 
     .hidden {
       display: none;
     }
 
-    input, button, select {
+    input, button {
       padding: 10px;
       margin: 10px;
       font-size: 1rem;
@@ -94,18 +93,34 @@
   </style>
 </head>
 <body>
-  <div id="login-screen" class="screen">
+  <div id="setup-screen" class="screen">
+    <h1>Welcome to EnfrokOS!</h1>
+    <input type="text" id="setup-name" placeholder="Enter your name" />
+    <input type="password" id="setup-password" placeholder="Create password (6+ digits)" />
+    <p id="setup-error" style="color:red;"></p>
+    <button onclick="completeSetup()">Continue</button>
+  </div>
+
+  <div id="conditions-screen" class="screen hidden">
+    <h2>Conditions in EnfrokOS</h2>
+    <ul style="text-align:left; max-width: 600px;">
+      <li>• Minimising on EnfrokOS is currently not available.</li>
+      <li>• There are currently four apps: Spotify, Browser, Settings and Calculator.</li>
+      <li>• Settings app is incomplete and would be functioning soon.</li>
+      <li>• Shifting the apps from one place to another is not available yet.</li>
+    </ul>
+    <button onclick="showLogin()">Continue</button>
+  </div>
+
+  <div id="login-screen" class="screen hidden">
     <h1>Welcome back!</h1>
-    <p>Please log in to continue.</p>
-    <input type="text" id="login-name" placeholder="Enter your name" />
-    <input type="password" id="login-password" placeholder="Enter password" />
-    <p id="login-error" style="color: red;"></p>
-    <button onclick="loginUser()">Login</button>
+    <input type="password" id="login-password" placeholder="Enter your password" />
+    <p id="login-error" style="color:red;"></p>
+    <button onclick="verifyLogin()">Login</button>
   </div>
 
   <div id="desktop" class="hidden">
-    <h1 id="desktop-greeting">Welcome to your desktop!</h1>
-    <p>Your OS is loading features soon...</p>
+    <h1 id="desktop-title"></h1>
     <div class="taskbar">
       <img src="icons/browser.png" class="icon" onclick="openApp('browser')" />
       <img src="icons/spotify.png" class="icon" onclick="openApp('spotify')" />
@@ -162,11 +177,31 @@
   </div>
 
   <script>
-    let savedName = "";
-    let savedPassword = "19841984";
+    let userPassword = "";
+    let userName = "User";
 
-    function loginUser() {
-      const name = document.getElementById("login-name").value.trim();
+    function completeSetup() {
+      const name = document.getElementById("setup-name").value.trim();
+      const pass = document.getElementById("setup-password").value.trim();
+      const error = document.getElementById("setup-error");
+
+      if (pass.length < 6) {
+        error.textContent = "Password should be minimum 6 digits.";
+        return;
+      }
+
+      userPassword = pass;
+      userName = name || "User";
+      document.getElementById("setup-screen").classList.add("hidden");
+      document.getElementById("conditions-screen").classList.remove("hidden");
+    }
+
+    function showLogin() {
+      document.getElementById("conditions-screen").classList.add("hidden");
+      document.getElementById("login-screen").classList.remove("hidden");
+    }
+
+    function verifyLogin() {
       const pass = document.getElementById("login-password").value.trim();
       const error = document.getElementById("login-error");
 
@@ -175,12 +210,14 @@
         return;
       }
 
-      error.textContent = "";
-      savedName = name || "User";
-      savedPassword = pass;
+      if (pass !== userPassword) {
+        error.textContent = "Incorrect password.";
+        return;
+      }
+
       document.getElementById("login-screen").classList.add("hidden");
       document.getElementById("desktop").classList.remove("hidden");
-      document.getElementById("desktop-greeting").textContent = `Welcome to your desktop, ${savedName}!`;
+      document.getElementById("desktop-title").textContent = `Welcome to your desktop, ${userName}`;
     }
 
     let calcExpression = "";
