@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enfrok OS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Roboto&family=Samsung+One&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif;
+    }
+
+    body {
+      background-color: #111;
+      color: white;
+      overflow: hidden;
+    }
+
+    #startup-screen, #login-screen, #notice-screen, #conditions-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+      text-align: center;
+      transition: opacity 1s ease;
+    }
+
+    #startup-screen input, #startup-screen button, #startup-screen select,
+    #login-screen input, #login-screen button,
+    #notice-screen button, #conditions-screen button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .taskbar {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40px;
+      background-color: rgba(30, 30, 30, 0.85);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .window {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      width: 500px;
+      height: 400px;
+      background-color: #fff;
+      color: black;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      flex-direction: column;
+    }
+
+    .window-header {
+      background-color: #0078d7;
+      color: white;
+      padding: 5px 10px;
+    }
+
+    .window-body {
+      padding: 10px;
+      flex-grow: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="startup-screen">
+    <h1>Welcome to EnfrokOS!</h1>
+    <p>You're setting up your OS. Please follow these instructions:</p>
+    <ul style="text-align:left; max-width: 600px;">
+      <li>This OS supports only Spotify and Wikipedia in the browser.</li>
+      <li>You can search for your favorite singers in the Spotify app.</li>
+      <li>Password must be at least 6 digits.</li>
+    </ul>
+    <input type="text" id="username" placeholder="Enter your name">
+    <input type="password" id="password" placeholder="Set your password">
+    <div id="error-msg" style="color:red"></div>
+    <button onclick="startConditions()">Continue</button>
+  </div>
+
+  <div id="conditions-screen" class="hidden">
+    <h2>Conditions in EnfrokOS</h2>
+    <p style="max-width: 600px; margin: 10px auto;">
+      • Minimising on EnfrokOS is currently not available.<br>
+      • There are currently four apps: Spotify, Browser, Settings and Calculator.<br>
+      • Settings app is incomplete and will function soon.<br>
+      • Shifting apps is not available yet.
+    </p>
+    <button onclick="showLogin()">Continue</button>
+  </div>
+
+  <div id="login-screen" class="hidden">
+    <h1 id="greet-title"></h1>
+    <p>Login to proceed</p>
+    <input type="password" id="login-pass" placeholder="Enter password">
+    <div id="login-error" style="color:red"></div>
+    <button onclick="verifyLogin()">Login</button>
+  </div>
+
+  <div id="notice-screen" class="hidden">
+    <h2>The Operating System is incomplete</h2>
+    <p>We're updating this OS very soon. New features are under development.</p>
+    <button onclick="enterOS()">Continue</button>
+  </div>
+
+  <script>
+    let savedPassword = "";
+    let savedUsername = "";
+
+    function startConditions() {
+      const name = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (pass.length < 6) {
+        document.getElementById('error-msg').textContent = 'Password should be minimum 6 digits.';
+        return;
+      }
+
+      savedPassword = pass;
+      savedUsername = name || "User";
+
+      document.getElementById('startup-screen').classList.add('hidden');
+      document.getElementById('conditions-screen').classList.remove('hidden');
+    }
+
+    function showLogin() {
+      document.getElementById('conditions-screen').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('greet-title').textContent = `Welcome, ${savedUsername}`;
+    }
+
+    function verifyLogin() {
+      const inputPass = document.getElementById('login-pass').value;
+
+      if (inputPass === savedPassword) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('notice-screen').classList.remove('hidden');
+      } else {
+        document.getElementById('login-error').textContent = 'Incorrect password.';
+      }
+    }
+
+    function enterOS() {
+      document.getElementById('notice-screen').classList.add('hidden');
+      alert("OS would launch here (add more UI below)");
+    }
+  </script>
+
+</body>
+</html>
