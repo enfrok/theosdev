@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enfrok OS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet">
+  <title>EnfrokOS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     * {
       margin: 0;
@@ -12,12 +12,23 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    body, html {
       width: 100%;
       height: 100%;
-      font-family: 'Arimo', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: #888;
       color: white;
+      overflow: hidden;
+    }
+
+    .fade {
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .screen {
@@ -30,14 +41,10 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background-color: rgba(0, 0, 0, 0.85);
-      z-index: 1000;
       padding: 20px;
       text-align: center;
-    }
-
-    .hidden {
-      display: none;
+      background-color: rgba(0,0,0,0.9);
+      z-index: 1000;
     }
 
     input, button {
@@ -55,13 +62,19 @@
       display: flex;
       align-items: center;
       padding: 0 10px;
+      gap: 10px;
     }
 
     .icon {
       width: 32px;
       height: 32px;
-      margin: 0 5px;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 6px;
       cursor: pointer;
+      color: black;
     }
 
     .window {
@@ -93,15 +106,21 @@
   </style>
 </head>
 <body>
-  <div id="setup-screen" class="screen">
+  <div id="setup-screen" class="screen fade">
     <h1>Welcome to EnfrokOS!</h1>
+    <p>You're about to set up your OS. Info:</p>
+    <ul style="text-align:left; max-width: 600px;">
+      <li>• Spotify and Wikipedia supported in Browser.</li>
+      <li>• Spotify app lets you search your favorite artists worldwide.</li>
+      <li>• You'll login with the password you set now.</li>
+    </ul>
     <input type="text" id="setup-name" placeholder="Enter your name" />
     <input type="password" id="setup-password" placeholder="Create password (6+ digits)" />
     <p id="setup-error" style="color:red;"></p>
     <button onclick="completeSetup()">Continue</button>
   </div>
 
-  <div id="conditions-screen" class="screen hidden">
+  <div id="conditions-screen" class="screen fade hidden">
     <h2>Conditions in EnfrokOS</h2>
     <ul style="text-align:left; max-width: 600px;">
       <li>• Minimising on EnfrokOS is currently not available.</li>
@@ -112,20 +131,20 @@
     <button onclick="showLogin()">Continue</button>
   </div>
 
-  <div id="login-screen" class="screen hidden">
-    <h1>Welcome back!</h1>
-    <input type="password" id="login-password" placeholder="Enter your password" />
+  <div id="login-screen" class="screen fade hidden">
+    <h1>Enter your password to login</h1>
+    <input type="password" id="login-password" placeholder="Password" />
     <p id="login-error" style="color:red;"></p>
     <button onclick="verifyLogin()">Login</button>
   </div>
 
-  <div id="desktop" class="hidden">
+  <div id="desktop" class="fade hidden">
     <h1 id="desktop-title"></h1>
     <div class="taskbar">
-      <img src="icons/browser.png" class="icon" onclick="openApp('browser')" />
-      <img src="icons/spotify.png" class="icon" onclick="openApp('spotify')" />
-      <img src="icons/calculator.png" class="icon" onclick="openApp('calculator')" />
-      <img src="icons/settings.png" class="icon" onclick="openApp('settings')" />
+      <div class="icon" onclick="openApp('browser')"><i class="fas fa-globe"></i></div>
+      <div class="icon" onclick="openApp('spotify')"><i class="fab fa-spotify"></i></div>
+      <div class="icon" onclick="openApp('calculator')"><i class="fas fa-calculator"></i></div>
+      <div class="icon" onclick="openApp('settings')"><i class="fas fa-cog"></i></div>
     </div>
   </div>
 
@@ -192,13 +211,12 @@
 
       userPassword = pass;
       userName = name || "User";
-      document.getElementById("setup-screen").classList.add("hidden");
-      document.getElementById("conditions-screen").classList.remove("hidden");
+
+      fadeTo("setup-screen", "conditions-screen");
     }
 
     function showLogin() {
-      document.getElementById("conditions-screen").classList.add("hidden");
-      document.getElementById("login-screen").classList.remove("hidden");
+      fadeTo("conditions-screen", "login-screen");
     }
 
     function verifyLogin() {
@@ -215,9 +233,38 @@
         return;
       }
 
-      document.getElementById("login-screen").classList.add("hidden");
-      document.getElementById("desktop").classList.remove("hidden");
       document.getElementById("desktop-title").textContent = `Welcome to your desktop, ${userName}`;
+      fadeTo("login-screen", "desktop");
+    }
+
+    function fadeTo(fromId, toId) {
+      document.getElementById(fromId).classList.add("hidden");
+      setTimeout(() => {
+        document.getElementById(fromId).style.display = "none";
+        document.getElementById(toId).style.display = "flex";
+        setTimeout(() => {
+          document.getElementById(toId).classList.remove("hidden");
+        }, 50);
+      }, 1000);
+    }
+
+    function openApp(id) {
+      document.querySelectorAll('.window').forEach(win => win.style.display = 'none');
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function loadWebsite() {
+      const input = document.getElementById("url").value;
+      const frame = document.getElementById("webview");
+      if (input.startsWith("https://")) {
+        if (input.includes("wikipedia") || input.includes("spotify")) {
+          frame.src = input;
+        } else {
+          frame.srcdoc = "<p style='color:red;'>Website not supported by this OS.</p>";
+        }
+      } else {
+        frame.srcdoc = "<p style='color:red;'>Add https:// to run or if it doesn't work, the website is not supported.</p>";
+      }
     }
 
     let calcExpression = "";
@@ -238,25 +285,6 @@
     function clearCalc() {
       calcExpression = "";
       document.getElementById("calc-display").value = "";
-    }
-
-    function openApp(id) {
-      document.querySelectorAll('.window').forEach(win => win.style.display = 'none');
-      document.getElementById(id).style.display = 'flex';
-    }
-
-    function loadWebsite() {
-      const input = document.getElementById("url").value;
-      const frame = document.getElementById("webview");
-      if (input.startsWith("https://")) {
-        if (input.includes("wikipedia") || input.includes("spotify")) {
-          frame.src = input;
-        } else {
-          frame.srcdoc = "<p style='color:red;'>Website not supported by this OS.</p>";
-        }
-      } else {
-        frame.srcdoc = "<p style='color:red;'>Add https:// to run or if it doesn't work, the website is not supported.</p>";
-      }
     }
   </script>
 </body>
