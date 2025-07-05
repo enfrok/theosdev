@@ -12,13 +12,12 @@
       box-sizing: border-box;
     }
 
-    body, html {
+    html, body {
       width: 100%;
       height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif;
-      background-color: #000;
+      background-color: #888; /* grey background */
       color: white;
-      overflow: hidden;
     }
 
     .screen {
@@ -27,17 +26,25 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: black;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      text-align: center;
+      background-color: rgba(0, 0, 0, 0.85);
       z-index: 1000;
+      padding: 20px;
+      text-align: center;
+      transition: opacity 1s ease;
     }
 
     .hidden {
-      display: none !important;
+      display: none;
+    }
+
+    input, button, select {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1rem;
     }
 
     .taskbar {
@@ -45,7 +52,7 @@
       bottom: 0;
       width: 100%;
       height: 40px;
-      background-color: rgba(30, 30, 30, 0.85);
+      background: rgba(20, 20, 20, 0.9);
       display: flex;
       align-items: center;
       padding: 0 10px;
@@ -54,81 +61,96 @@
     .icon {
       width: 32px;
       height: 32px;
-      margin-right: 10px;
+      margin: 0 5px;
       cursor: pointer;
     }
 
     .window {
       position: absolute;
-      top: 100px;
-      left: 100px;
+      top: 80px;
+      left: 80px;
       width: 500px;
       height: 400px;
-      background-color: #fff;
-      color: black;
-      border: 1px solid #ccc;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      background: #fff;
+      color: #000;
+      border-radius: 6px;
       display: none;
       flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .window-header {
-      background-color: #0078d7;
-      color: white;
-      padding: 5px 10px;
+      background-color: #444;
+      color: #fff;
+      padding: 8px;
+      font-weight: bold;
     }
 
     .window-body {
-      padding: 10px;
-      flex-grow: 1;
+      padding: 15px;
       overflow-y: auto;
+      flex-grow: 1;
     }
   </style>
 </head>
 <body>
-  <div id="setup" class="screen">
-    <h1>Welcome to EnfrokOS!</h1>
-    <p>Enter your name:</p>
-    <input type="text" id="name" />
-    <p>Create a password (min 6 digits):</p>
-    <input type="password" id="pass" />
-    <p id="passErr" style="color:red;"></p>
-    <button onclick="submitSetup()">Continue</button>
+  <div id="login-screen" class="screen">
+    <h1>Welcome back!</h1>
+    <p>Please log in to continue.</p>
+    <input type="text" id="login-name" placeholder="Enter your name" />
+    <input type="password" id="login-password" placeholder="Enter password" />
+    <p id="login-error" style="color: red;"></p>
+    <button onclick="loginUser()">Login</button>
   </div>
 
-  <div id="conditions" class="screen hidden">
-    <h2>Conditions in EnfrokOS</h2>
-    <ul>
-      <li>• Minimising on EnfrokOS is currently not available.</li>
-      <li>• There are currently four apps: Spotify, Browser, Settings and Calculator.</li>
-      <li>• Settings app is incomplete and would be functioning soon.</li>
-      <li>• Shifting the apps from one place to another is not available yet.</li>
-    </ul>
-    <button onclick="showLogin()">Continue</button>
-  </div>
-
-  <div id="login" class="screen hidden">
-    <h1>Welcome to EnfrokOS</h1>
-    <input type="password" id="loginPass" placeholder="Enter your password" />
-    <p id="loginErr" style="color:red;"></p>
-    <button onclick="validateLogin()">Login</button>
-  </div>
-
-  <div id="desktop" class="screen hidden">
-    <h1 id="welcomeText"></h1>
+  <div id="desktop" class="hidden">
+    <h1 id="desktop-greeting">Welcome to your desktop!</h1>
     <p>Your OS is loading features soon...</p>
     <div class="taskbar">
-      <img src="https://img.icons8.com/ios-filled/50/ffffff/calculator.png" class="icon" onclick="toggleApp('calculator')" title="Calculator">
-      <img src="https://img.icons8.com/ios-filled/50/ffffff/settings.png" class="icon" onclick="toggleApp('settings')" title="Settings">
-      <img src="https://img.icons8.com/ios-filled/50/ffffff/internet.png" class="icon" onclick="toggleApp('browser')" title="Browser">
-      <img src="https://img.icons8.com/ios-filled/50/ffffff/spotify.png" class="icon" onclick="toggleApp('spotify')" title="Spotify">
+      <img src="icons/browser.png" class="icon" onclick="openApp('browser')" />
+      <img src="icons/spotify.png" class="icon" onclick="openApp('spotify')" />
+      <img src="icons/calculator.png" class="icon" onclick="openApp('calculator')" />
+      <img src="icons/settings.png" class="icon" onclick="openApp('settings')" />
+    </div>
+  </div>
+
+  <div id="browser" class="window">
+    <div class="window-header">Browser</div>
+    <div class="window-body">
+      <input type="text" id="url" placeholder="Enter URL (https://...)" style="width: 100%;" />
+      <button onclick="loadWebsite()">Go</button>
+      <iframe id="webview" style="width: 100%; height: 80%;"></iframe>
+    </div>
+  </div>
+
+  <div id="spotify" class="window">
+    <div class="window-header">Spotify</div>
+    <div class="window-body">
+      <iframe src="https://open.spotify.com/embed" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
     </div>
   </div>
 
   <div id="calculator" class="window">
     <div class="window-header">Calculator</div>
     <div class="window-body">
-      <iframe src="https://www.desmos.com/scientific" width="100%" height="100%"></iframe>
+      <input type="text" id="calc-display" readonly style="width: 100%; font-size: 24px;" /><br/>
+      <button onclick="appendCalc('1')">1</button>
+      <button onclick="appendCalc('2')">2</button>
+      <button onclick="appendCalc('3')">3</button>
+      <button onclick="appendCalc('+')">+</button><br/>
+      <button onclick="appendCalc('4')">4</button>
+      <button onclick="appendCalc('5')">5</button>
+      <button onclick="appendCalc('6')">6</button>
+      <button onclick="appendCalc('-')">-</button><br/>
+      <button onclick="appendCalc('7')">7</button>
+      <button onclick="appendCalc('8')">8</button>
+      <button onclick="appendCalc('9')">9</button>
+      <button onclick="appendCalc('*')">*</button><br/>
+      <button onclick="appendCalc('0')">0</button>
+      <button onclick="appendCalc('.')">.</button>
+      <button onclick="calculate()">=</button>
+      <button onclick="appendCalc('/')">/</button>
+      <button onclick="clearCalc()">C</button>
     </div>
   </div>
 
@@ -139,77 +161,9 @@
     </div>
   </div>
 
-  <div id="browser" class="window">
-    <div class="window-header">Browser</div>
-    <div class="window-body">
-      <input type="text" id="urlInput" placeholder="Enter URL e.g. https://wikipedia.org" style="width:100%; padding:5px;" />
-      <button onclick="loadWebsite()">Go</button>
-      <iframe id="browserFrame" style="width:100%; height:300px;"></iframe>
-      <p id="browserError" style="color:red;"></p>
-    </div>
-  </div>
-
-  <div id="spotify" class="window">
-    <div class="window-header">Spotify</div>
-    <div class="window-body">
-      <iframe style="border-radius:12px" src="https://open.spotify.com/embed" width="100%" height="300" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-  </div>
-
   <script>
-    let userPass = "";
-    let userName = "";
+    let savedName = "";
+    let savedPassword = "19841984";
 
-    function submitSetup() {
-      const name = document.getElementById("name").value;
-      const pass = document.getElementById("pass").value;
-      if (pass.length < 6) {
-        document.getElementById("passErr").textContent = "Password should be minimum 6 digits.";
-        return;
-      }
-      userPass = pass;
-      userName = name || "User";
-      document.getElementById("setup").classList.add("hidden");
-      document.getElementById("conditions").classList.remove("hidden");
-    }
-
-    function showLogin() {
-      document.getElementById("conditions").classList.add("hidden");
-      document.getElementById("login").classList.remove("hidden");
-    }
-
-    function validateLogin() {
-      const entered = document.getElementById("loginPass").value;
-      if (entered !== userPass) {
-        document.getElementById("loginErr").textContent = "Incorrect password.";
-        return;
-      }
-      document.getElementById("login").classList.add("hidden");
-      document.getElementById("desktop").classList.remove("hidden");
-      document.getElementById("welcomeText").textContent = `Welcome to your desktop, ${userName}!`;
-    }
-
-    function toggleApp(id) {
-      const win = document.getElementById(id);
-      win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    function loadWebsite() {
-      const input = document.getElementById("urlInput").value.trim();
-      const frame = document.getElementById("browserFrame");
-      const error = document.getElementById("browserError");
-      if (!input.startsWith("https://")) {
-        error.textContent = "Add https:// to run or if it doesn't work, the website is not supported.";
-        return;
-      }
-      if (input.includes("spotify.com") || input.includes("wikipedia.org")) {
-        frame.src = input;
-        error.textContent = "";
-      } else {
-        error.textContent = "Website not capable to work.";
-      }
-    }
-  </script>
-</body>
-</html>
-
+    function
+      
